@@ -2,6 +2,36 @@ import matplotlib.pyplot as plt
 import random
 
 ##################################################################
+# --------- Resample curves ----------- -------------------------#
+##################################################################
+
+def extrapolate_discrete_function(x_vals, y_vals, domain=[0.0, 1.0]):
+    def new_fct(x):
+        if not domain[0] <= x <= domain[1]:
+            return 0
+        i = 0
+        while x > x_vals[i] and i < len(x_vals):
+            i += 1
+        if x >= x_vals[i] or i == 0:
+            return y_vals[i]
+        a = x_vals[i - 1]
+        b = x_vals[i]
+        fa = y_vals[i - 1]
+        fb = y_vals[i]
+        return fa + (x - a) * (fb - fa) / (b - a)
+    return new_fct
+
+def sample_curve(fct, k_sampling_points=100, domain=[0.0, 1.0]):
+    x_vals = [domain[0] + k * (domain[1] - domain[0]) / (k_sampling_points - 1) for k in range(k_sampling_points)]
+    y_vals = [fct(x) for x in x_vals]
+    return x_vals, y_vals
+
+def resample_curve(x_vals, y_vals,  k_sampling_points=100, domain=[0.0, 1.0]):
+    return sample_curve(
+        extrapolate_discrete_function(x_vals, y_vals, domain), k_sampling_points, domain
+    )
+
+##################################################################
 # --------- Function for networkx graph -------------------------#
 ##################################################################
 
@@ -22,7 +52,7 @@ def plot_function(nodes_list, graphs, node_id, function):
     y = []
     for node in nodes_list:
         y.append(graphs[node_id].nodes[node][function])
-    x = [i/len(y) for i in range(len(y))]
+    x = [i/(len(y)-1) for i in range(len(y))]
     plt.plot(x,y)
         
 ##################################################################
