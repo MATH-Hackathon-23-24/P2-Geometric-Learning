@@ -1,9 +1,20 @@
 import matplotlib.pyplot as plt
 import random
+import geomstats.backend as gs
+from geomstats.geometry.discrete_curves import insert_zeros
 
 ##################################################################
 # --------- Resample curves ----------- -------------------------#
 ##################################################################
+
+def get_curve_from_graph(node_id, graphs, function):
+    nodes_list1 = random_graph_sequence(graphs[node_id])
+
+    y1 = []
+    for node in nodes_list1:
+        y1.append(graphs[node_id].nodes[node][function])
+    x1 = [i/(len(y1)-1) for i in range(len(y1))]
+    return x1, y1
 
 def extrapolate_discrete_function(x_vals, y_vals, domain=[0.0, 1.0]):
     def new_fct(x):
@@ -47,6 +58,16 @@ def remove_undirected_edges(G):
 ##################################################################
 # --------- Plot function ---------------------------------------#
 ##################################################################
+
+def plot_curve(curve, fmt="o-k", ax=None, add_origin=True):
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(7, 7))
+
+    if add_origin:
+        curve = insert_zeros(curve, axis=-2)
+    ax.plot(curve[:, 0], curve[:, 1], fmt)
+
+    return ax
 
 def plot_function(nodes_list, graphs, node_id, function):
     y = []
