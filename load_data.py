@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 
 def is_flake_of_stone(flake_id, stone_id) -> bool:
-    return flake_id[:-2] == stone_id
+    return flake_id[:len(stone_id)] == stone_id
 
 def z_score_normalize(data):
     # normalize 1D data array
@@ -59,7 +59,17 @@ def read_and_normalize_property_data(dataset, stone_ids):
                                 "scar_count": []}
         
     for index, row in dataset.iterrows():
-        id = row['Sample_ID'][:-2]
+        id1 = row['Sample_ID'][:-2]
+        id2 = row['Sample_ID'][:-1]
+        id3 = row['Sample_ID'][:-3]
+        if id1 in stone_ids:
+            id = id1
+        elif id2 in stone_ids:
+            id = id2
+        elif id3 in stone_ids:
+            id = id3
+        else:
+            id = None
         if id not in stone_ids:
             continue
         data_collection[id]["surface"].append(row['Surface_Area_mm^2']) 

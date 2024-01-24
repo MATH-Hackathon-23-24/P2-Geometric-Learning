@@ -7,14 +7,29 @@ from geomstats.geometry.discrete_curves import insert_zeros
 # --------- Resample curves ----------- -------------------------#
 ##################################################################
 
+def get_resampled_geostats_curve(node_id, graphs, function, k_sampling_points):
+    x, y = get_curve_from_graph(node_id, graphs, function)
+    x_resample, y_resample = resample_curve(x, y, k_sampling_points=k_sampling_points)
+    curve = gs.vstack((x_resample, y_resample)).T
+    return curve
+
 def get_curve_from_graph(node_id, graphs, function):
     nodes_list1 = random_graph_sequence(graphs[node_id])
-
     y1 = []
     for node in nodes_list1:
         y1.append(graphs[node_id].nodes[node][function])
     x1 = [i/(len(y1)-1) for i in range(len(y1))]
     return x1, y1
+
+def get_highDim_curve(node_id, graphs, k_sampling_points):
+    x, y1 = get_curve_from_graph(node_id, graphs, "surface")
+    _, y2 = get_curve_from_graph(node_id, graphs, "volume")
+    _, y3 = get_curve_from_graph(node_id, graphs, "scar_count")
+    x_resample, y1_resample = resample_curve(x, y1, k_sampling_points=k_sampling_points)
+    _, y2_resample = resample_curve(x, y2, k_sampling_points=k_sampling_points)
+    _, y3_resample = resample_curve(x, y3, k_sampling_points=k_sampling_points)
+    curve = gs.vstack((x_resample, y1_resample, y2_resample, y3_resample)).T
+    return curve
 
 def extrapolate_discrete_function(x_vals, y_vals, domain=[0.0, 1.0]):
     def new_fct(x):
